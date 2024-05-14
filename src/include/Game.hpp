@@ -46,6 +46,7 @@ class Game{
 
     private:
         bool gameRunning = 0;
+        bool menuRendered = 0;
         int gameState = 0;
         int gameScore = 0;
         Player character;

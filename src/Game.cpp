@@ -107,8 +107,9 @@ Player Game::getPlayer() const {
 
 void Game::startNewGame(WindowRenderer& renderer){
     this->gameStartedPlaying = SDL_GetTicks();
-    this->gameState = 1; // Started Playing
-
+    this->gameState = GAME_PLAYING; 
+    this->menuRendered = false;
+    this->gameScore = 0;
     SDL_Texture* charImage = renderer.loadTexture("./assets/images/player_icon.png");
     this->character = Player(
         50, 50,  
@@ -118,15 +119,17 @@ void Game::startNewGame(WindowRenderer& renderer){
         charImage
     );
 
-    SDL_Texture* starImage = renderer.loadTexture("./assets/images/star_icon.png");
-    Entity star(
-        50, 50, 
-        400, 400, 
-        0, 0, 
-        ENTITY_STAR,
-        starImage
-    );
-    this->starList.push_back(star);
+    if (this->starList.size() == 0){
+        SDL_Texture* starImage = renderer.loadTexture("./assets/images/star_icon.png");
+        Entity star(
+            50, 50, 
+            400, 400, 
+            0, 0, 
+            ENTITY_STAR,
+            starImage
+        );
+        this->starList.push_back(star);
+    }
 
     // Loading Infomation
     this->timeElapsedInfo = Button(
@@ -198,10 +201,13 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
 
     // Check and add new bullets
     uint32_t currentTime = SDL_GetTicks();
-    
-    if (!this->bulletList.size() || (currentTime - (*this->bulletList.rbegin()).getTimeAdded()) / 1000.0 >= BULLET_SPAWNING_TIME){
-        // After 3 seconds, a new bullet spawns
-        
+    double timePassed = (currentTime - this->gameStartedPlaying) / 1000.0;
+    double bulletSpawnTime = 2 - sqrt(std::min(120.0, timePassed) / 41.5);
+
+    // Exponentially reduce spawn time until 2 minutes
+    // Spawn rate: 2 -> 0.3
+
+    if (!this->bulletList.size() || (currentTime - (*this->bulletList.rbegin()).getTimeAdded()) / 1000.0 >= bulletSpawnTime){
         int side = utils::random(0, 3);
         Bullet bullet;
         SDL_Texture* bullet30 = renderer.loadTexture("./assets/images/bullet30x30.png");
@@ -211,28 +217,28 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
                 bullet = Bullet(
                     30, 30,
                     utils::random(100, SCREEN_WIDTH - 100), 0 - 30,
-                    utils::random(-30, 30)/100.0, utils::random(10, 30)/100.0,
+                    utils::random(-25, 25)/100.0, utils::random(15, 25)/100.0,
                     ENTITY_BULLET, 
                     bullet30
                 );
 
                 break;
 
-            case SCREEN_DOWN:
-                bullet = Bullet(
-                    30, 30,
-                    utils::random(100, SCREEN_WIDTH - 100), SCREEN_HEIGHT,
-                    utils::random(-30, 30)/100.0, utils::random(-30, -10)/100.0,
-                    ENTITY_BULLET, 
-                    bullet30
-                );
-                break;
+            // case SCREEN_DOWN:
+            //     bullet = Bullet(
+            //         30, 30,
+            //         utils::random(100, SCREEN_WIDTH - 100), SCREEN_HEIGHT,
+            //         utils::random(-25, 25)/100.0, utils::random(-25, -15)/100.0,
+            //         ENTITY_BULLET, 
+            //         bullet30
+            //     );
+            //     break;
             
             case SCREEN_LEFT:
                 bullet = Bullet(
                     30, 30,
                     0 - 30, utils::random(100, SCREEN_WIDTH - 100),
-                    utils::random(10, 30)/100.0, utils::random(-30, 30)/100.0,
+                    utils::random(15, 25)/100.0, utils::random(-25, 25)/100.0,
                     ENTITY_BULLET, 
                     bullet30
                 );
@@ -243,7 +249,7 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
                 bullet = Bullet(
                     30, 30,
                     SCREEN_WIDTH, utils::random(100, SCREEN_WIDTH - 100),
-                    utils::random(-30, -10)/100.0, utils::random(-30, 30)/100.0,
+                    utils::random(-25, -15)/100.0, utils::random(-25, 25)/100.0,
                     ENTITY_BULLET, 
                     bullet30
                 );
@@ -280,6 +286,8 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
                     newBulletList.push_back(bullet);   
                     if (this->character.checkCollision(bullet)){
                         // Ending the game
+                        this->bulletList.clear();
+                        this->starList.clear();
                         this->endGame();
                     }
                 //}
@@ -342,8 +350,12 @@ Menu* Game::getMainMenu(){
     return &this->mainMenu;
 }
 void Game::renderMainMenu(WindowRenderer& renderer){
-    SDL_SetRenderDrawColor(renderer.getRenderer(), 0, 0, 0, 255);
-    renderer.clear();
+    if (this->menuRendered == false){
+        SDL_SetRenderDrawColor(renderer.getRenderer(), 0, 0, 0, 255);
+        renderer.clear();
+        this->menuRendered = true;
+    }
+    
     //std::cout << "Size: " << this->mainMenu.getButtonList().size() << std::endl;
     renderer.render(this->gameTitle);
     for (auto &button: this->mainMenu.getButtonList()){

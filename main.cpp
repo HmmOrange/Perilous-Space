@@ -88,6 +88,17 @@ int main(int argc, char *argv[]){
             }
             else SDL_Delay(1);
         }
+        else if (currentGameState == GAME_END){
+            bool rendered = false;
+            if (!rendered) game.renderMainMenu(renderer);
+            rendered = true;
+
+            int mouseX, mouseY;
+            SDL_GetMouseState(&mouseX, &mouseY);
+            game.getMainMenu()->updateButtonState(mouseX, mouseY, inputHandler.getMouseState());
+            if (game.hasClickedStart())
+                game.startNewGame(renderer);
+        }
         
     }
     
