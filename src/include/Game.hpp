@@ -20,14 +20,16 @@
 #define GAME_PLAYING 1
 #define GAME_PAUSE 2
 #define GAME_END 3
+#define GAME_QUIT 4
 
 class Game{
     public: 
         Game(WindowRenderer& renderer);
         bool isRunning() const;
         bool hasClickedStart() const;
+        bool hasClickedQuit() const;
         int getState() const;
-        void changeState(int state);
+        void updateState(int state);
 
         void addStar(const Entity& star);
         void addBullet(const Bullet& bullet);
@@ -42,10 +44,8 @@ class Game{
         void renderMainMenu(WindowRenderer& renderer);
         void renderPlaying(WindowRenderer& renderer);
         void endGame();
-        void closeGame();
 
     private:
-        bool gameRunning = 0;
         bool menuRendered = 0;
         int gameState = 0;
         int gameScore = 0;
@@ -66,6 +66,7 @@ class Game{
         Button timeElapsedInfo;
         Button scoreInfo;
         Button highscoreInfo;
+        Entity infoPlaceholder;
         TTF_Font* font;
 
 };

@@ -10,9 +10,10 @@
 const float GRAVITY = 0.2f;
 const float JUMP_STRENGTH = -40.0f;
 const float MOVE_SPEED = 0.3f;
+const int GAME_INFO_OFFSET = 50;
 
 bool Player::isOnGround(){
-    return this->getPosY() >= 1.0f * (SCREEN_HEIGHT - this->getCurrentFrame().h);
+    return this->getPosY() >= 1.0f * (SCREEN_HEIGHT - this->getCurrentFrame().h - GAME_INFO_OFFSET);
 }
 
 bool Player::checkCollision(Entity& entity){
@@ -60,7 +61,7 @@ void Player::updateMovement(const InputHandler& inputHandler, const float& delta
 void Player::updatePlayerPos(float x, float y) {
     // Temporarily preventing off-screen movement
     this->pos.x = std::min(std::max(0.0f, x), 1.0f * (SCREEN_WIDTH - currentFrame.w));
-    this->pos.y = std::min(std::max(0.0f, y), 1.0f * (SCREEN_HEIGHT - currentFrame.h));
+    this->pos.y = std::min(std::max(0.0f, y), 1.0f * (SCREEN_HEIGHT - currentFrame.h - GAME_INFO_OFFSET));
 
     //this->pos.x = x;
     //this->pos.y = y;

@@ -99,11 +99,13 @@ void WindowRenderer::render(const T& object){
 
 void WindowRenderer::render(Button& button){ 
     SDL_RenderCopy(this->renderer, button.getButtonTexture(), nullptr, button.getButtonRect());
-    //SDL_SetRenderDrawColor(this->renderer, button.getBgColor().r, button.getBgColor().g, button.getBgColor().b, button.getBgColor().a);
-    //SDL_RenderFillRect(this->renderer, button.getButtonRect());
+    SDL_SetRenderDrawColor(this->renderer, button.getBgColor().r, button.getBgColor().g, button.getBgColor().b, button.getBgColor().a);
+    SDL_RenderFillRect(this->renderer, button.getButtonRect());
     
     SDL_RenderCopy(this->renderer, button.getTextTexture(), nullptr, button.getTextRect());
     //std::cout << button.getButtonRect()->x << " " << button.getButtonRect()->y << std::endl;
+
+    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255); // Black color
 }
 
 

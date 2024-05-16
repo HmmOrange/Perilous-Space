@@ -13,9 +13,38 @@
 #define SCREEN_RIGHT 3
 #define BULLET_SPAWNING_TIME 1
 
+#define TIME_ELAPSED_INFO_X 25
+#define TIME_ELAPSED_INFO_Y 562
+#define TIME_ELAPSED_INFO_W 100
+#define TIME_ELAPSED_INFO_H 25
+
+#define SCORE_INFO_X 290
+#define SCORE_INFO_Y 562
+#define SCORE_INFO_W 100
+#define SCORE_INFO_H 25
+
+#define HIGHSCORE_INFO_X 580
+#define HIGHSCORE_INFO_Y 562
+#define HIGHSCORE_INFO_W 100
+#define HIGHSCORE_INFO_H 25
+
+#define PLACEHOLDER_X 0
+#define PLACEHOLDER_Y 550
+#define PLACEHOLDER_W 800
+#define PLACEHOLDER_H 50
+
+#define BUTTON_BACKGROUND_R 0
+#define BUTTON_BACKGROUND_G 0
+#define BUTTON_BACKGROUND_B 139
+#define BUTTON_BACKGROUND_A 255
+
+#define PLAYER_W 30
+#define PLAYER_H 30
+
+#define PLAYER_IMAGE_PATH "./assets/images/player_square.png"
+
 Game::Game(WindowRenderer& renderer){
     this->gameOpened = SDL_GetTicks();
-    this->gameRunning = true;
     this->gameState = GAME_MAIN_MENU;
     this->bulletList.clear();
     this->starList.clear();
@@ -26,7 +55,6 @@ Game::Game(WindowRenderer& renderer){
         std::cout << "Failed to init TTF! SDL_ttf Error: " << TTF_GetError() << std::endl;
     }
     this->font = TTF_OpenFont("./assets/fonts/Nunito-Bold.ttf", 20);
-    std::cout << font << std::endl;
     if (this->font == NULL) {
         std::cout << "Failed to load font! SDL_ttf Error: " << TTF_GetError() << std::endl;
     }
@@ -70,18 +98,23 @@ Game::Game(WindowRenderer& renderer){
 }
 
 bool Game::isRunning() const{
-    return this->gameRunning;
+    return this->gameState != GAME_QUIT;
 }
 
 bool Game::hasClickedStart() const{
+    //std::cout << this->mainMenu.getButtonList().size() << std::endl;
     return (this->mainMenu.getButtonList()[0]).getClickState() == IS_JUST_RELEASED;
+}
+
+bool Game::hasClickedQuit() const{
+    return (this->mainMenu.getButtonList()[1]).getClickState() == IS_JUST_RELEASED;
 }
 
 int Game::getState() const{
     return this->gameState;
 }
 
-void Game::changeState(int state){
+void Game::updateState(int state){
     this->gameState = state;
 }
 
@@ -110,9 +143,9 @@ void Game::startNewGame(WindowRenderer& renderer){
     this->gameState = GAME_PLAYING; 
     this->menuRendered = false;
     this->gameScore = 0;
-    SDL_Texture* charImage = renderer.loadTexture("./assets/images/player_icon.png");
+    SDL_Texture* charImage = renderer.loadTexture(PLAYER_IMAGE_PATH);
     this->character = Player(
-        50, 50,  
+        PLAYER_W, PLAYER_H;  
         200, 200, 
         0, 0, 
         ENTITY_PLAYER, 
@@ -133,9 +166,9 @@ void Game::startNewGame(WindowRenderer& renderer){
 
     // Loading Infomation
     this->timeElapsedInfo = Button(
-        20, 20, 100, 100,
+        TIME_ELAPSED_INFO_X, TIME_ELAPSED_INFO_Y, TIME_ELAPSED_INFO_W, TIME_ELAPSED_INFO_H,
         false, 
-        {174, 198, 207, 255},
+        {BUTTON_BACKGROUND_R, BUTTON_BACKGROUND_G, BUTTON_BACKGROUND_B, BUTTON_BACKGROUND_A},
         {253, 253, 150, 255},
         renderer, 
         this->font,
@@ -143,9 +176,9 @@ void Game::startNewGame(WindowRenderer& renderer){
     );
 
     this->scoreInfo = Button(
-        300, 20, 100, 100, 
+        SCORE_INFO_X, SCORE_INFO_Y, SCORE_INFO_W, SCORE_INFO_H,
         false, 
-        {174, 198, 207, 255},
+        {BUTTON_BACKGROUND_R, BUTTON_BACKGROUND_G, BUTTON_BACKGROUND_B, BUTTON_BACKGROUND_A},
         {253, 253, 150, 255},
         renderer,
         this->font,
@@ -183,13 +216,21 @@ void Game::startNewGame(WindowRenderer& renderer){
     }
 
     this->highscoreInfo = Button(
-        600, 20, 100, 100,
+        HIGHSCORE_INFO_X, HIGHSCORE_INFO_Y, HIGHSCORE_INFO_W, HIGHSCORE_INFO_H,
         false, 
-        {174, 198, 207, 255},
+        {BUTTON_BACKGROUND_R, BUTTON_BACKGROUND_G, BUTTON_BACKGROUND_B, BUTTON_BACKGROUND_A},
         {253, 253, 150, 255},
         renderer, 
         this->font, 
         ("Highscore: " + std::to_string(this->gameHighscore)).c_str()
+    );
+    SDL_Texture* infoPlaceholderImage = renderer.loadTexture("./assets/images/info_placeholder.png");
+    this->infoPlaceholder = Entity(
+        PLACEHOLDER_W, PLACEHOLDER_H,  
+        PLACEHOLDER_X, PLACEHOLDER_Y,
+        0, 0, 
+        ENTITY_OTHER, 
+        infoPlaceholderImage
     );
 }
 
@@ -297,6 +338,7 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
     this->bulletList = newBulletList;
 
     // Update Game Infomation
+
     uint32_t timeElapsed = (currentTime - this->gameStartedPlaying) / 1000;
     if (timeElapsed != this->prevGameRenderTime){
         SDL_DestroyTexture(this->timeElapsedInfo.getButtonTexture());
@@ -304,9 +346,9 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
 
         // UPDATE TEXT TEXTURE FUNCTION PLEASE
         this->timeElapsedInfo = Button(
-            20, 20, 100, 100,
+            TIME_ELAPSED_INFO_X, TIME_ELAPSED_INFO_Y, TIME_ELAPSED_INFO_W, TIME_ELAPSED_INFO_H,
             false,
-            {174, 198, 207},
+            {BUTTON_BACKGROUND_R, BUTTON_BACKGROUND_G, BUTTON_BACKGROUND_B, BUTTON_BACKGROUND_A},
             {253, 253, 150},
             renderer,
             this->font,
@@ -320,9 +362,9 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
         SDL_DestroyTexture(this->scoreInfo.getTextTexture());
 
         this->scoreInfo = Button(
-            300, 20, 100, 100,
+            SCORE_INFO_X, SCORE_INFO_Y, SCORE_INFO_W, SCORE_INFO_H,
             false,
-            {174, 198, 207},
+            {BUTTON_BACKGROUND_R, BUTTON_BACKGROUND_G, BUTTON_BACKGROUND_B, BUTTON_BACKGROUND_A},
             {253, 253, 150},
             renderer,
             this->font,
@@ -335,9 +377,9 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
         SDL_DestroyTexture(this->highscoreInfo.getButtonTexture());
         SDL_DestroyTexture(this->highscoreInfo.getTextTexture());
         this->highscoreInfo = Button(
-            600, 20, 100, 100,
+            HIGHSCORE_INFO_X, HIGHSCORE_INFO_Y, HIGHSCORE_INFO_W, HIGHSCORE_INFO_H,
             false,
-            {174, 198, 207},
+            {BUTTON_BACKGROUND_R, BUTTON_BACKGROUND_G, BUTTON_BACKGROUND_B, BUTTON_BACKGROUND_A},
             {253, 253, 150},
             renderer,
             this->font,
@@ -377,6 +419,7 @@ void Game::renderPlaying(WindowRenderer& renderer){
     for (auto &bullet: this->bulletList)
         renderer.render(bullet);
 
+    renderer.render(this->infoPlaceholder);
     renderer.render(this->timeElapsedInfo);
     renderer.render(this->scoreInfo);
     renderer.render(this->highscoreInfo);
@@ -396,8 +439,4 @@ void Game::endGame(){
     else{
         std::cout << "Error: Unable to save file! " << SDL_GetError() << std::endl;
     }
-}
-
-void Game::closeGame(){
-    this->gameRunning = false;
 }

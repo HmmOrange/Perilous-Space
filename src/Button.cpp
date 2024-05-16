@@ -46,11 +46,11 @@ SDL_Texture* Button::getButtonTexture(){
 SDL_Color Button::getBgColor(){
     return this->bgColor;
 }
-const SDL_Rect* Button::getTextRect(){
-    return &this->textRect;
+SDL_Rect* Button::getTextRect(){
+    return &(this->textRect);
 }
-const SDL_Rect* Button::getButtonRect(){
-    return &this->buttonRect;
+SDL_Rect* Button::getButtonRect(){
+    return &(this->buttonRect);
 }
 int Button::getClickState() const{
     return this->clickState;

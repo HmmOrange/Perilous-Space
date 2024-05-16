@@ -24,8 +24,8 @@ class Button{
         SDL_Texture* getTextTexture();
         SDL_Texture* getButtonTexture();
         SDL_Color getBgColor();
-        const SDL_Rect* getTextRect();
-        const SDL_Rect* getButtonRect();
+        SDL_Rect* getTextRect();
+        SDL_Rect* getButtonRect();
 
         int getClickState() const;
         void updateClickState(int state);
