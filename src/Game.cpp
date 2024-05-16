@@ -143,9 +143,11 @@ void Game::startNewGame(WindowRenderer& renderer){
     this->gameState = GAME_PLAYING; 
     this->menuRendered = false;
     this->gameScore = 0;
+    this->bulletList.clear();
+    this->starList.clear();
     SDL_Texture* charImage = renderer.loadTexture(PLAYER_IMAGE_PATH);
     this->character = Player(
-        PLAYER_W, PLAYER_H;  
+        PLAYER_W, PLAYER_H, 
         200, 200, 
         0, 0, 
         ENTITY_PLAYER, 
@@ -324,16 +326,16 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
             case ENTITY_BULLET:
                 bullet.updateMovement();
                 //if (bullet.isOutsidePlayground()){
-                    newBulletList.push_back(bullet);   
                     if (this->character.checkCollision(bullet)){
                         // Ending the game
-                        this->bulletList.clear();
-                        this->starList.clear();
                         this->endGame();
+                        break;
                     }
+                    newBulletList.push_back(bullet);   
                 //}
                 break;
         }
+        if (this->gameState == GAME_END) break;
     }
     this->bulletList = newBulletList;
 

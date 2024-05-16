@@ -43,7 +43,7 @@ int main(int argc, char *argv[]){
         
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_QUIT){
-                game.closeGame();
+                game.updateState(GAME_QUIT);
                 break;
             }
 
@@ -79,6 +79,8 @@ int main(int argc, char *argv[]){
             game.getMainMenu()->updateButtonState(mouseX, mouseY, inputHandler.getMouseState());
             if (game.hasClickedStart())
                 game.startNewGame(renderer);
+            else if (game.hasClickedQuit())
+                game.updateState(GAME_QUIT);
         }
         else if (currentGameState == GAME_PLAYING){
             game.processGameEvents(renderer, inputHandler, deltaTime);
@@ -98,10 +100,16 @@ int main(int argc, char *argv[]){
             game.getMainMenu()->updateButtonState(mouseX, mouseY, inputHandler.getMouseState());
             if (game.hasClickedStart())
                 game.startNewGame(renderer);
+            else if (game.hasClickedQuit()){
+                std::cout << "hi" << std::endl;
+                game.updateState(GAME_QUIT);
+            }
         }
-        
+        else if (currentGameState == GAME_QUIT){
+            break;
+        }
     }
-    
+
     renderer.cleanUp();
     SDL_Quit();
     return 0;
