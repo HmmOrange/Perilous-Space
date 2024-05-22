@@ -79,7 +79,6 @@ void WindowRenderer::clear(){
 
 template void WindowRenderer::render<Entity>(const Entity& object);
 template void WindowRenderer::render<Bullet>(const Bullet& object);
-template void WindowRenderer::render<Player>(const Player& object);
 
 template <typename T>
 void WindowRenderer::render(const T& object){
@@ -95,6 +94,23 @@ void WindowRenderer::render(const T& object){
     dst.w = object.getCurrentFrame().w;
     dst.h = object.getCurrentFrame().h;
     SDL_RenderCopy(this->renderer, object.getTexture(), &src, &dst);
+}
+
+void WindowRenderer::render(const Player& player){
+    SDL_Rect src;
+    src.x = player.getCurrentFrame().x;
+    src.y = player.getCurrentFrame().y;
+    src.w = player.getCurrentFrame().w;
+    src.h = player.getCurrentFrame().h;
+
+    SDL_Rect dst;
+    dst.x = (int)round(player.getPosX());
+    dst.y = (int)round(player.getPosY());
+    dst.w = player.getCurrentFrame().w;
+    dst.h = player.getCurrentFrame().h;
+
+    if (player.hasShield()) SDL_RenderCopy(this->renderer, player.getShieldedTexture(), &src, &dst);
+    else SDL_RenderCopy(this->renderer, player.getTexture(), &src, &dst);
 }
 
 void WindowRenderer::render(Button& button){ 

@@ -20,6 +20,7 @@ class WindowRenderer{
 
         template <typename T>
         void render(const T& object);
+        void render(const Player& player);
         void render(Button& button);
         void display();
         int getRefreshRate();

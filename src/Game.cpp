@@ -42,14 +42,19 @@
 #define PLAYER_H 30
 
 #define PLAYER_IMAGE_PATH "./assets/images/player_square.png"
+#define SHIELDED_PLAYER_IMAGE_PATH "./assets/images/shielded_player_square.png"
+#define SHIELD_IMAGE_PATH "./assets/images/shield_icon.png"
+#define SHIELD_TIMER_IMAGE_PATH "./assets/images/shield_timer_circle.png"
 
 Game::Game(WindowRenderer& renderer){
     this->gameOpened = SDL_GetTicks();
     this->gameState = GAME_MAIN_MENU;
     this->bulletList.clear();
     this->starList.clear();
+    this->shieldList.clear();
     this->gameScore = 0;
     this->gameHighscore = 0;
+    this->shieldTimerCircleTexture = renderer.loadTexture(SHIELD_TIMER_IMAGE_PATH);
     
     if (TTF_Init() != 0){
         std::cout << "Failed to init TTF! SDL_ttf Error: " << TTF_GetError() << std::endl;
@@ -140,18 +145,22 @@ Player Game::getPlayer() const {
 
 void Game::startNewGame(WindowRenderer& renderer){
     this->gameStartedPlaying = SDL_GetTicks();
+    this->lastShieldTime = SDL_GetTicks();
     this->gameState = GAME_PLAYING; 
     this->menuRendered = false;
     this->gameScore = 0;
     this->bulletList.clear();
     this->starList.clear();
+    this->shieldList.clear();
+
     SDL_Texture* charImage = renderer.loadTexture(PLAYER_IMAGE_PATH);
+    SDL_Texture* shieldedImage = renderer.loadTexture(SHIELDED_PLAYER_IMAGE_PATH);
     this->character = Player(
         PLAYER_W, PLAYER_H, 
         200, 200, 
         0, 0, 
         ENTITY_PLAYER, 
-        charImage
+        charImage, shieldedImage
     );
 
     if (this->starList.size() == 0){
@@ -236,7 +245,7 @@ void Game::startNewGame(WindowRenderer& renderer){
     );
 }
 
-void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& inputHandler, const float& deltaTime){
+void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& inputHandler, const double& deltaTime){
     // Update player moment based on key presses
     // if (this->font)
     //     std::cout << "###" << this->font << std::endl;
@@ -302,6 +311,22 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
         this->bulletList.push_back(bullet);
     }
 
+    // Spawn shield every 20 second
+    if ((currentTime - this->lastShieldTime) / 1000.0 >= 10){
+        SDL_Texture* shieldImage = renderer.loadTexture(SHIELD_IMAGE_PATH);
+       
+        Entity shield(
+            50, 50, 
+            utils::random(100, 700), utils::random(100, 500), 
+            0, 0, 
+            ENTITY_SHIELD,
+            shieldImage
+        );
+
+        this->shieldList.push_back(shield);
+        this->lastShieldTime = currentTime;
+    }
+
     // Update star upon collision and bullets' movement
     bool newScore = false;
     for (Entity &star: this->starList){
@@ -320,18 +345,23 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
     }
 
     std::vector<Bullet> newBulletList;
-
     for (Bullet &bullet: this->bulletList){    
         switch (bullet.getType()){
             case ENTITY_BULLET:
                 bullet.updateMovement();
+                bool deleteBullet = false;
                 //if (bullet.isOutsidePlayground()){
                     if (this->character.checkCollision(bullet)){
+                        if (this->character.hasShield()){
+                            this->character.updateShield(false);
+                            deleteBullet = true;
+                            break;
+                        }
                         // Ending the game
                         this->endGame();
                         break;
                     }
-                    newBulletList.push_back(bullet);   
+                    if (!deleteBullet) newBulletList.push_back(bullet);   
                 //}
                 break;
         }
@@ -339,9 +369,23 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
     }
     this->bulletList = newBulletList;
 
+    std::vector<Entity> newShieldList;
+    for (Entity &shield: this->shieldList){    
+        switch (shield.getType()){
+            case ENTITY_SHIELD:
+                if (this->character.checkCollision(shield)){
+                    this->character.updateShield(true);
+                    break;
+                }
+                else 
+                    newShieldList.push_back(shield);
+        }
+    }
+    this->shieldList = newShieldList;
+
     // Update Game Infomation
 
-    uint32_t timeElapsed = (currentTime - this->gameStartedPlaying) / 1000;
+    uint32_t timeElapsed = (currentTime - this->gameStartedPlaying) / 1000 ;
     if (timeElapsed != this->prevGameRenderTime){
         SDL_DestroyTexture(this->timeElapsedInfo.getButtonTexture());
         SDL_DestroyTexture(this->timeElapsedInfo.getTextTexture());
@@ -415,12 +459,43 @@ void Game::renderPlaying(WindowRenderer& renderer){
     renderer.clear();
     renderer.render(this->character);
 
+    bool removeShield = false;
+    for (auto &shield: this->shieldList){
+        uint32_t currentTime = SDL_GetTicks();
+        double shieldTimePassed = (currentTime - shield.getTimeAdded()) / 1000.0;
+        if (shieldTimePassed > 5){
+            removeShield = true;
+            break;
+        }
+        
+
+        Entity shieldTimerCircle(
+            80, 80, 
+            shield.getPosX() - 15, shield.getPosY() - 15, 
+            0, 0, 
+            ENTITY_OTHER,
+            this->shieldTimerCircleTexture
+        );
+
+        renderer.render(shieldTimerCircle);
+        utils::drawPie(
+            renderer,
+            shield.getPosX() + 25, shield.getPosY() + 25,
+            38, 
+            0, 360 / 5 * shieldTimePassed
+        );
+        renderer.render(shield);
+    }
+
+    if (removeShield) this->shieldList.clear();
+
     for (auto &star: this->starList)
         renderer.render(star);
 
     for (auto &bullet: this->bulletList)
         renderer.render(bullet);
 
+    
     renderer.render(this->infoPlaceholder);
     renderer.render(this->timeElapsedInfo);
     renderer.render(this->scoreInfo);

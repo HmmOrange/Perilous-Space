@@ -40,7 +40,7 @@ class Game{
         Menu* getMainMenu();
 
         void startNewGame(WindowRenderer& renderer);
-        void processGameEvents(WindowRenderer& renderer, const InputHandler& inputHandler, const float& deltaTime);
+        void processGameEvents(WindowRenderer& renderer, const InputHandler& inputHandler, const double& deltaTime);
         void renderMainMenu(WindowRenderer& renderer);
         void renderPlaying(WindowRenderer& renderer);
         void endGame();
@@ -50,12 +50,15 @@ class Game{
         int gameState = 0;
         int gameScore = 0;
         Player character;
+        SDL_Texture* shieldTimerCircleTexture;
         std::vector<Bullet> bulletList;
         std::vector<Entity> starList;
+        std::vector<Entity> shieldList;
         
         uint32_t gameOpened = 0;
         uint32_t gameStartedPlaying = 0;
         uint32_t prevGameRenderTime = 0;
+        uint32_t lastShieldTime = 0;
         Sint32 gameHighscore;
 
         Menu mainMenu;

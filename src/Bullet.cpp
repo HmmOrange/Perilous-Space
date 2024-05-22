@@ -4,7 +4,7 @@
 
 #include "Math.hpp"
 #include "Entity.hpp"
-#include "KeyboardHandler.hpp"
+#include "InputHandler.hpp"
 #include "Bullet.hpp"
 
 bool Bullet::isOutsidePlayground() const {
@@ -15,7 +15,6 @@ bool Bullet::isOutsidePlayground() const {
 
     return down || up || left || right;
 }
-
 
 void Bullet::updateMovement(){
     this->updatePos(this->getPosX() + this->getVelX(), this->getPosY() + this->getVelY());

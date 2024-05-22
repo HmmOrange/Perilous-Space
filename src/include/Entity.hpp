@@ -12,7 +12,8 @@
 #define ENTITY_PLAYER 0
 #define ENTITY_STAR 1
 #define ENTITY_BULLET 2
-#define ENTITY_OTHER 3
+#define ENTITY_SHIELD 3
+#define ENTITY_OTHER 4
 
 class Entity{
     public: 

@@ -10,12 +10,21 @@
 
 class Player: public Entity{
     using Entity::Entity;
-    
+
     public: 
+        Player(int w, int h, float x, float y, float velX, float velY, int type, SDL_Texture *playerTexture, SDL_Texture *shieldedTexture);
+
+        SDL_Texture* shieldedTexture;
+
         bool isJumping = 0;
-        bool isOnGround();
+        bool isShielded = false;
+        bool isOnGround() const;
+        bool hasShield() const;
         bool checkCollision(Entity& entity);
-        void updateMovement(const InputHandler& keyHandler, const float& deltaTime);
-        void updatePlayerPos(float x, float y);
-    
+
+        void updateShield(bool isShielded);
+        void updateMovement(const InputHandler& keyHandler, const double& deltaTime);
+        void updatePlayerPos(double x, double y);
+
+        SDL_Texture* getShieldedTexture() const;
 };
