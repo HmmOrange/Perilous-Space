@@ -51,6 +51,10 @@
 #define SHIELD_TIMER_IMAGE_PATH "./assets/images/shield_timer_circle.png"
 #define BUTTON_BACKGROUND_IMAGE_PATH "./assets/images/button.png"
 #define GAME_TITLE_IMAGE_PATH "./assets/images/game_title_400x200.png"
+#define STAR_COLLECT_SFX_PATH "./assets/audio/star_collect.wav"
+#define SHIELD_COLLECT_SFX_PATH "./assets/audio/shield_collect.wav"
+#define JUMP_SFX_PATH "./assets/audio/jump.ogg"
+#define BULLET_COLLISION_SFX_PATH "./assets/audio/bullet_collision.wav"
 
 Game::Game(WindowRenderer& renderer){
     this->gameOpened = SDL_GetTicks();
@@ -70,6 +74,42 @@ Game::Game(WindowRenderer& renderer){
     if (this->font == NULL) {
         std::cout << "Failed to load font! SDL_ttf Error: " << TTF_GetError() << std::endl;
     }
+
+    // if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+    //     std::cout << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
+    // }
+
+    // if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    //     std::cout << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
+    // }
+    
+    // if (Mix_Init(MIX_INIT_WAVPACK) & MIX_INIT_WAVPACK != MIX_INIT_WAVPACK){
+    //     std::cout << "Failed to initialize OGG" << " " << Mix_GetError() << std::endl;
+    // }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        std::cout <<  "Failed to initialize SDL_mixer! SDL_mixer Error: " << Mix_GetError() << std::endl;
+    }
+
+    this->starCollectSFX = Mix_LoadWAV(STAR_COLLECT_SFX_PATH);
+    if (!this->starCollectSFX) {
+        std::cout << "Failed to load star WAV file: " << Mix_GetError() << std::endl;
+    }
+
+    this->shieldCollectSFX = Mix_LoadWAV(SHIELD_COLLECT_SFX_PATH);
+    if (!this->shieldCollectSFX) {
+        std::cout << "Failed to load shield WAV file: " << Mix_GetError() << std::endl;
+    }
+    
+    this->bulletCollisionSFX = Mix_LoadWAV(BULLET_COLLISION_SFX_PATH);
+    if (!this->shieldCollectSFX) {
+        std::cout << "Failed to load shield WAV file: " << Mix_GetError() << std::endl;
+    }
+
+    // this->jumpSFX = Mix_LoadWAV(JUMP_SFX_PATH);
+    // if (!this->jumpSFX) {
+    //     std::cout << "Failed to load star OGG file: " << Mix_GetError() << std::endl;
+    // }
 
     this->mainMenu = Menu();
 
@@ -343,6 +383,11 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
                     star.updatePos(utils::random(100, 700), utils::random(100, 500));
                     //std::cout << "After change:" << star.getPosX() << std::endl;
                     this->gameScore++;
+                    Mix_PlayChannel(-1, this->starCollectSFX, 0);
+                    //std::cout << Mix_PlayMusic(this->starCollectSFX, 0) << std::endl;
+                    // if (Mix_PlayChannel(-1, this->starCollectSFX, 0) == -1) {  // 0 means play once
+                    //     std::cout << "Failed to play star sound effect: " << Mix_GetError() << std::endl;
+                    // }
                     newScore = true;
              }
         }
@@ -357,6 +402,7 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
                 bool deleteBullet = false;
                 //if (bullet.isOutsidePlayground()){
                     if (this->character.checkCollision(bullet)){
+                        Mix_PlayChannel(-1, this->bulletCollisionSFX, 0);
                         if (this->character.hasShield()){
                             this->character.updateShield(false);
                             deleteBullet = true;
@@ -380,6 +426,7 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
             case ENTITY_SHIELD:
                 if (this->character.checkCollision(shield)){
                     this->character.updateShield(true);
+                    Mix_PlayChannel(-1, this->shieldCollectSFX, 0);
                     break;
                 }
                 else 

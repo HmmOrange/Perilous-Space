@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 #include <algorithm>
 #include <vector>
@@ -72,4 +73,8 @@ class Game{
         Entity infoPlaceholder;
         TTF_Font* font;
 
+        Mix_Chunk* starCollectSFX;
+        Mix_Chunk* jumpSFX;
+        Mix_Chunk* shieldCollectSFX;
+        Mix_Chunk* bulletCollisionSFX;
 };
