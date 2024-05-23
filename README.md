@@ -1,6 +1,9 @@
 # Perilous-Space
 A minimally working game with a shit ton of bugs
 
+# How to play
+Up arrow to fly, left/right to move horizontally. Collect stars to earn scores while avoiding the bullets. Shields will spawn periodically to assist you :D
+
 # My to-do list
 - More gameplay focused feature
 - New difficulty mode and difficulty adjustments
@@ -9,6 +12,5 @@ A minimally working game with a shit ton of bugs
 - Actual playtesting
 
 # Credits
-- Asset: https://kenney.nl/assets
-- Audio:
-- Font: Nunito
+- Asset & audio: https://kenney.nl/assets
+- Font: Nunito & Cocogoose
