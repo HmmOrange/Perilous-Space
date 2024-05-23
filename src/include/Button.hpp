@@ -18,6 +18,8 @@ class Button{
     public: 
         Button();
         Button(float x, float y, int w, int h, bool clickable, SDL_Color bgColor, SDL_Color textColor, WindowRenderer& renderer, TTF_Font* font, const char* label);
+        Button(float x, float y, int w, int h, bool clickable, SDL_Texture* buttonTexture, SDL_Color textColor, WindowRenderer& renderer, TTF_Font* font, const char* label);
+
         float getPosX() const;
         float getPosY() const;
 
@@ -38,7 +40,7 @@ class Button{
         int clickState = IS_NOT_CLICKED;
         bool hasJustReleased = false;
         TTF_Font* font;
-        SDL_Color bgColor;
+        SDL_Color bgColor = {0, 0, 0, 0};
         SDL_Color textColor;
         SDL_Texture *textTexture;
         SDL_Texture *buttonTexture;

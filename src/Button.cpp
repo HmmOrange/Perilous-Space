@@ -32,6 +32,23 @@ Button::Button(float x, float y, int w, int h, bool clickable, SDL_Color bgColor
     // std::cout << buttonRect.x << " " << buttonRect.y << std::endl;
 }
 
+Button::Button(float x, float y, int w, int h, bool clickable, SDL_Texture* buttonTexture, SDL_Color textColor, WindowRenderer& renderer, TTF_Font* font, const char* label){
+    this->clickable = clickable;
+    this->textColor = textColor;
+    this->bgColor = bgColor;
+    this->font = font;
+    this->textTexture = renderer.loadTextTexture(this->textColor, font, label);
+    this->buttonTexture = buttonTexture;
+    
+    this->textRect = {(int)x, (int)y, 0, 0};
+    SDL_QueryTexture(this->textTexture, nullptr, nullptr, &this->textRect.w, &this->textRect.h);
+    this->textRect.x += (w - textRect.w) / 2;
+    this->textRect.y += (h - textRect.h) / 2;
+
+    this->buttonRect = {(int)x, (int)y, w, h};
+    // std::cout << buttonRect.x << " " << buttonRect.y << std::endl;
+}
+
 bool Button::onHover(int mouseX, int mouseY) const {
     return (this->buttonRect.x <= mouseX && mouseX < this->buttonRect.x + this->buttonRect.w)
         && (this->buttonRect.y <= mouseY && mouseY < this->buttonRect.y + this->buttonRect.h);

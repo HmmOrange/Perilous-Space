@@ -19,7 +19,7 @@ namespace utils{
     }
 
     void drawPie(WindowRenderer renderer, int centerX, int centerY, int radius, double startAngle, double endAngle) {
-        SDL_SetRenderDrawColor(renderer.getRenderer(), 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer.getRenderer(), 118, 2, 137, 255); // Purple color
         
         double startRad = (startAngle - 90) * M_PI / 180.0;
         double endRad = (endAngle - 90) * M_PI / 180.0;
@@ -29,7 +29,7 @@ namespace utils{
         }
 
         double angleStep = 0.01; 
-        int thickness = 3;
+        int thickness = 4;
 
         std::vector<SDL_Point> points;
         for (int t = 0; t < thickness; t++) {
@@ -45,9 +45,9 @@ namespace utils{
             int y = centerY + currentRadius * sin(endRad);
             points.push_back({x, y});
         }
-        
+
         SDL_RenderDrawLines(renderer.getRenderer(), points.data(), points.size());
 
-        SDL_SetRenderDrawColor(renderer.getRenderer(), 0, 0, 0, 255); // Black color  
+        SDL_SetRenderDrawColor(renderer.getRenderer(), 118, 2, 137, 0); // Purple color
     }
 }   

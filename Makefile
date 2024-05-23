@@ -5,7 +5,7 @@ CC = g++
 CFLAGS = -I./src/include
 
 # Linker flags
-LDFLAGS = -L./src/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
+LDFLAGS = -L./src/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 # Source files
 # Find all cpp files in src directory, but main.cpp stays in root

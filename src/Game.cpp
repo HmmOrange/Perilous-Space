@@ -41,10 +41,16 @@
 #define PLAYER_W 30
 #define PLAYER_H 30
 
+#define STAR_W 40
+#define STAR_H 40
+
 #define PLAYER_IMAGE_PATH "./assets/images/player_square.png"
+#define STAR_IMAGE_PATH "./assets/images/star.png"
 #define SHIELDED_PLAYER_IMAGE_PATH "./assets/images/shielded_player_square.png"
 #define SHIELD_IMAGE_PATH "./assets/images/shield_icon.png"
 #define SHIELD_TIMER_IMAGE_PATH "./assets/images/shield_timer_circle.png"
+#define BUTTON_BACKGROUND_IMAGE_PATH "./assets/images/button.png"
+#define GAME_TITLE_IMAGE_PATH "./assets/images/game_title_400x200.png"
 
 Game::Game(WindowRenderer& renderer){
     this->gameOpened = SDL_GetTicks();
@@ -55,10 +61,11 @@ Game::Game(WindowRenderer& renderer){
     this->gameScore = 0;
     this->gameHighscore = 0;
     this->shieldTimerCircleTexture = renderer.loadTexture(SHIELD_TIMER_IMAGE_PATH);
-    
+
     if (TTF_Init() != 0){
         std::cout << "Failed to init TTF! SDL_ttf Error: " << TTF_GetError() << std::endl;
     }
+
     this->font = TTF_OpenFont("./assets/fonts/Nunito-Bold.ttf", 20);
     if (this->font == NULL) {
         std::cout << "Failed to load font! SDL_ttf Error: " << TTF_GetError() << std::endl;
@@ -66,7 +73,7 @@ Game::Game(WindowRenderer& renderer){
 
     this->mainMenu = Menu();
 
-    SDL_Texture* titleImage = renderer.loadTexture("./assets/images/game_title_400x200.png");
+    SDL_Texture* titleImage = renderer.loadTexture(GAME_TITLE_IMAGE_PATH);
     this->gameTitle = Entity(
         400, 200, 
         200, 50, 
@@ -75,12 +82,11 @@ Game::Game(WindowRenderer& renderer){
         titleImage
     );
 
-
+    SDL_Texture* buttonBackgroundImage = renderer.loadTexture(BUTTON_BACKGROUND_IMAGE_PATH);
     this->startButton = Button(
         320, 300, 200, 60,
         false,
-        //{174, 198, 207},
-        {0, 0, 255, 255},
+        buttonBackgroundImage,
         {253, 253, 150, 255},
         renderer,
         font,
@@ -91,8 +97,7 @@ Game::Game(WindowRenderer& renderer){
     this->quitButton = Button(
         320, 400, 200, 60,
         false,
-        //{174, 198, 207},
-        {0, 0, 255, 255},
+        buttonBackgroundImage,
         {253, 253, 150, 255},
         renderer,
         font,
@@ -164,9 +169,9 @@ void Game::startNewGame(WindowRenderer& renderer){
     );
 
     if (this->starList.size() == 0){
-        SDL_Texture* starImage = renderer.loadTexture("./assets/images/star_icon.png");
+        SDL_Texture* starImage = renderer.loadTexture(STAR_IMAGE_PATH);
         Entity star(
-            50, 50, 
+            STAR_W, STAR_H, 
             400, 400, 
             0, 0, 
             ENTITY_STAR,
@@ -316,7 +321,7 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
         SDL_Texture* shieldImage = renderer.loadTexture(SHIELD_IMAGE_PATH);
        
         Entity shield(
-            50, 50, 
+            30, 30, 
             utils::random(100, 700), utils::random(100, 500), 
             0, 0, 
             ENTITY_SHIELD,
@@ -439,7 +444,7 @@ Menu* Game::getMainMenu(){
 }
 void Game::renderMainMenu(WindowRenderer& renderer){
     if (this->menuRendered == false){
-        SDL_SetRenderDrawColor(renderer.getRenderer(), 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer.getRenderer(), 118, 2, 137, 0);
         renderer.clear();
         this->menuRendered = true;
     }
@@ -470,8 +475,8 @@ void Game::renderPlaying(WindowRenderer& renderer){
         
 
         Entity shieldTimerCircle(
-            80, 80, 
-            shield.getPosX() - 15, shield.getPosY() - 15, 
+            50, 50, 
+            shield.getPosX() - 10, shield.getPosY() - 10, 
             0, 0, 
             ENTITY_OTHER,
             this->shieldTimerCircleTexture
@@ -480,8 +485,8 @@ void Game::renderPlaying(WindowRenderer& renderer){
         renderer.render(shieldTimerCircle);
         utils::drawPie(
             renderer,
-            shield.getPosX() + 25, shield.getPosY() + 25,
-            38, 
+            shield.getPosX() + 15, shield.getPosY() + 15,
+            22, 
             0, 360 / 5 * shieldTimePassed
         );
         renderer.render(shield);

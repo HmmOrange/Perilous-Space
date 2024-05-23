@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "WindowRenderer.hpp"
 #include "Entity.hpp"
@@ -11,18 +12,25 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+
+#define CURSOR_IMAGE_PATH "./assets/images/cursor.png"
+
 const float FIXED_FRAME_RATE = 1.0/60;
 
 int main(int argc, char *argv[]){
     
     SDL_Init(SDL_INIT_EVERYTHING);
     
-    WindowRenderer renderer("Hi :D", SCREEN_WIDTH, SCREEN_HEIGHT);
+    WindowRenderer renderer("Square Scramble :D", SCREEN_WIDTH, SCREEN_HEIGHT);
     int refreshRate = renderer.getRefreshRate();
 
-    /* Initializing Game Loop */
+    /* Initializing Game */
     SDL_Event event;
     InputHandler inputHandler;
+
+    SDL_Surface *cursorSurface = IMG_Load(CURSOR_IMAGE_PATH);
+    SDL_Cursor *cursor = SDL_CreateColorCursor(cursorSurface, 0, 0);
+    SDL_SetCursor(cursor);
 
     // Do not use () for arg-less class.
     Game game(renderer);

@@ -7,3 +7,8 @@ A minimally working game with a shit ton of bugs
 - Assets D:
 - Code tweaks and cleanup (dwindle some files, constant variables, consistent variable naming, general coding convention,...)
 - Actual playtesting
+
+# Credits
+- Asset: https://kenney.nl/assets
+- Audio:
+- Font: Nunito
