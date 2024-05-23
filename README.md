@@ -1,6 +1,8 @@
 # Square Scramble
 A minimally working game with (perhaps) a shit ton of bugs
 
+![Game Preview](./assets/images/game_preview.png)
+
 # How to play
 Up arrow to fly, left/right to move horizontally. Collect stars to earn scores while avoiding the bullets. Shields will spawn periodically to assist you :D
 

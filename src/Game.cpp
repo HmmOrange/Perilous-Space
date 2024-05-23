@@ -357,7 +357,7 @@ void Game::processGameEvents(WindowRenderer& renderer, const InputHandler& input
     }
 
     // Spawn shield every 20 second
-    if ((currentTime - this->lastShieldTime) / 1000.0 >= 10){
+    if ((currentTime - this->lastShieldTime) / 1000.0 >= 20){
         SDL_Texture* shieldImage = renderer.loadTexture(SHIELD_IMAGE_PATH);
        
         Entity shield(
