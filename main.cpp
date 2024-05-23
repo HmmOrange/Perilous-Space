@@ -14,6 +14,7 @@
 #define SCREEN_HEIGHT 600
 
 #define CURSOR_IMAGE_PATH "./assets/images/cursor.png"
+#define CLICK_SFX_PATH "./assets/audio/click.wav"
 
 const float FIXED_FRAME_RATE = 1.0/60;
 
@@ -36,6 +37,12 @@ int main(int argc, char *argv[]){
     Game game(renderer);
     //game.startNewGame(renderer);
 
+
+    Mix_Chunk* clickSFX = Mix_LoadWAV(CLICK_SFX_PATH);
+    if (!clickSFX) {
+        std::cout << "Failed to load click WAV file: " << Mix_GetError() << std::endl;
+    }
+    
     Uint32 prevTime = SDL_GetTicks();
     float frameCounter = 0;
     float unprocessedTime = 0;
@@ -85,10 +92,13 @@ int main(int argc, char *argv[]){
             int mouseX, mouseY;
             SDL_GetMouseState(&mouseX, &mouseY);
             game.getMainMenu()->updateButtonState(mouseX, mouseY, inputHandler.getMouseState());
-            if (game.hasClickedStart())
+            if (game.hasClickedStart()){
+                Mix_PlayChannel(-1, clickSFX, 0);
                 game.startNewGame(renderer);
-            else if (game.hasClickedQuit())
+            }
+            else if (game.hasClickedQuit()){
                 game.updateState(GAME_QUIT);
+            }
         }
         else if (currentGameState == GAME_PLAYING){
             game.processGameEvents(renderer, inputHandler, deltaTime);
@@ -106,8 +116,10 @@ int main(int argc, char *argv[]){
             int mouseX, mouseY;
             SDL_GetMouseState(&mouseX, &mouseY);
             game.getMainMenu()->updateButtonState(mouseX, mouseY, inputHandler.getMouseState());
-            if (game.hasClickedStart())
+            if (game.hasClickedStart()){
                 game.startNewGame(renderer);
+                Mix_PlayChannel(-1, clickSFX, 0);
+            }
             else if (game.hasClickedQuit())
                 game.updateState(GAME_QUIT);
         }

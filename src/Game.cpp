@@ -263,7 +263,7 @@ void Game::startNewGame(WindowRenderer& renderer){
     }
     else{
         // Load data
-        std::cout << "Reading highscore file...!" << std::endl;
+        //std::cout << "Reading highscore file...!" << std::endl;
         
         SDL_RWread(highscoreFile, &this->gameHighscore, sizeof(Sint32), 1);
 

@@ -33,8 +33,8 @@ void Menu::updateButtonState(int mouseX, int mouseY, int mouseState){
         }
     }
     
-    if (this->buttonList[0].getClickState() == IS_JUST_RELEASED) 
-        std::cout << this->buttonList[0].getClickState() << std::endl;
+    // if (this->buttonList[0].getClickState() == IS_JUST_RELEASED) 
+    //   std::cout << this->buttonList[0].getClickState() << std::endl;
 }
 std::vector<Button> Menu::getButtonList() const {
     return this->buttonList;
